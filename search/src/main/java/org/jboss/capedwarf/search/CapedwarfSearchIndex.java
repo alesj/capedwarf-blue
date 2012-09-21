@@ -144,6 +144,11 @@ public class CapedwarfSearchIndex implements Index {
         }
     }
 
+    public Document get(String documentId) {
+        CacheValue value = cache.get(getCacheKey(documentId));
+        return (value != null ? value.getDocument() : null);
+    }
+
     private CacheKey getCacheKey(String documentId) {
         return new CacheKey(getName(), getNamespace(), documentId);
     }
@@ -170,9 +175,9 @@ public class CapedwarfSearchIndex implements Index {
         }
 
         return ReflectionUtils.newInstance(
-            AddResponse.class,
-            new Class[]{List.class, List.class},
-            new Object[]{documentList, documentIds});
+                AddResponse.class,
+                new Class[]{List.class, List.class},
+                new Object[]{documentList, documentIds});
     }
 
     private String generateId(Document document) {
@@ -252,9 +257,9 @@ public class CapedwarfSearchIndex implements Index {
     @SuppressWarnings("unchecked")
     private Results<ScoredDocument> newResults(OperationResult operationResult, Collection<ScoredDocument> results, long numberFound, int numberReturned, Cursor cursor) {
         return ReflectionUtils.newInstance(
-            Results.class,
-            new Class[]{OperationResult.class, Collection.class, long.class, int.class, Cursor.class},
-            new Object[]{operationResult, results, numberFound, numberReturned, cursor}
+                Results.class,
+                new Class[]{OperationResult.class, Collection.class, long.class, int.class, Cursor.class},
+                new Object[]{operationResult, results, numberFound, numberReturned, cursor}
         );
     }
 
