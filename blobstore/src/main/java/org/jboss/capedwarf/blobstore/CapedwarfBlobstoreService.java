@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -39,9 +40,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.ByteRange;
+import com.google.appengine.api.blobstore.FileInfo;
 import com.google.appengine.api.blobstore.UnsupportedRangeFormatException;
 import com.google.appengine.api.blobstore.UploadOptions;
 import com.google.appengine.api.files.AppEngineFile;
@@ -216,5 +219,13 @@ public class CapedwarfBlobstoreService implements BlobstoreService {
 
     public BlobKey createGsBlobKey(String name) {
         return null; // TODO
+    }
+
+    public Map<String, List<BlobInfo>> getBlobInfos(HttpServletRequest httpServletRequest) {
+        return Collections.emptyMap(); // TODO
+    }
+
+    public Map<String, List<FileInfo>> getFileInfos(HttpServletRequest httpServletRequest) {
+        return Collections.emptyMap(); // TODO
     }
 }
