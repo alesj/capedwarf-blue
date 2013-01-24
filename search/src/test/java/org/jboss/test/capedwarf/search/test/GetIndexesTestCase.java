@@ -27,8 +27,6 @@ import java.util.Arrays;
 import com.google.appengine.api.search.GetIndexesRequest;
 import com.google.appengine.api.search.GetResponse;
 import com.google.appengine.api.search.Index;
-import com.google.appengine.api.search.ListIndexesRequest;
-import com.google.appengine.api.search.ListIndexesResponse;
 import org.jboss.test.capedwarf.common.support.All;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -49,10 +47,6 @@ public class GetIndexesTestCase extends AbstractTest {
 
         GetResponse<Index> response = service.getIndexes(GetIndexesRequest.newBuilder());
         assertEquals(Arrays.asList(barIndex, fooIndex), response.getResults());
-
-        // test legacy usage
-        ListIndexesResponse lir = service.listIndexes(ListIndexesRequest.newBuilder().build());
-        assertEquals(Arrays.asList(barIndex, fooIndex), lir.getIndexes());
     }
 
 }
