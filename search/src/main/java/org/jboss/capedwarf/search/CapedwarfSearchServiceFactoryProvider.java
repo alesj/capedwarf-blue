@@ -37,7 +37,7 @@ import org.kohsuke.MetaInfServices;
 public class CapedwarfSearchServiceFactoryProvider extends CapedwarfFactoryProvider<ISearchServiceFactory> {
     private final ISearchServiceFactory factory = new ISearchServiceFactory() {
         public SearchService getSearchService(String s) {
-            return new CapedwarfSearchService();
+            return new CapedwarfSearchService(s);
         }
     };
 
