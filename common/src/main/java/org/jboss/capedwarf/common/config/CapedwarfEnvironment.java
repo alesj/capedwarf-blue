@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.NamespaceManager;
 import com.google.appengine.api.backends.BackendService;
@@ -50,6 +51,7 @@ import org.jboss.capedwarf.shared.config.QueueXml;
  */
 public class CapedwarfEnvironment implements ApiProxy.Environment, Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
+    private static final Logger log = Logger.getLogger(CapedwarfEnvironment.class.getName());
 
     public static final String DEFAULT_VERSION_HOSTNAME = "com.google.appengine.runtime.default_version_hostname";
 
@@ -69,13 +71,14 @@ public class CapedwarfEnvironment implements ApiProxy.Environment, Serializable,
 
     private static final long GLOBAL_TIME_LIMIT = Long.parseLong(System.getProperty("jboss.capedwarf.globalTimeLimit", "60000"));
 
-    private long requestStart;
+    private final long requestStart;
+    private final Map<String, Object> attributes;
+
     private volatile Boolean checkGlobalTimeLimit;
 
     private String email;
     private boolean isAdmin;
     private String authDomain;
-    private Map<String, Object> attributes;
 
     private CapedwarfConfiguration capedwarfConfiguration;
     private AppEngineWebXml appEngineWebXml;
@@ -89,13 +92,9 @@ public class CapedwarfEnvironment implements ApiProxy.Environment, Serializable,
     private int counter;
 
     public CapedwarfEnvironment() {
-        init();
-    }
-
-    private void init() {
         requestStart = System.currentTimeMillis();
         // attributes
-        attributes = new ConcurrentHashMap<String, Object>();
+        attributes = new CheckMap();
         // a bit of a workaround for LocalServiceTestHelper::tearDown NPE
         attributes.put(REQUEST_END_LISTENERS, new ArrayList());
         // add thread factory
@@ -322,6 +321,34 @@ public class CapedwarfEnvironment implements ApiProxy.Environment, Serializable,
 
     public void setUserId(String userId) {
         getAttributes().put(USER_ID_KEY, userId);
+    }
+
+    private class CheckMap extends ConcurrentHashMap<String, Object> {
+        private volatile boolean flag = true;
+
+        public Object get(Object key) {
+            if (flag && BackendService.DEVAPPSERVER_PORTMAPPING_KEY.equals(key)) {
+                if (backends == null) {
+                    log.warning("No backends.xml setup yet!?");
+                    return null;
+                }
+                if (isProduction()) {
+                    log.warning("Production env -- no dev app server port mapping!");
+                    return null;
+                }
+                synchronized (CapedwarfEnvironment.this) {
+                    if (flag) {
+                        flag = false;
+                        Map<String, String> portMap = new HashMap<String, String>();
+                        for (BackendsXml.Backend bb : backends) {
+                            portMap.put(bb.getName(), getDefaultVersionHostname());
+                        }
+                        put(BackendService.DEVAPPSERVER_PORTMAPPING_KEY, portMap);
+                    }
+                }
+            }
+            return super.get(key);
+        }
     }
 }
 
