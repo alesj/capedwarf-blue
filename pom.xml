@@ -85,12 +85,14 @@
         <version.org.datanucleus.jta>1.1.1</version.org.datanucleus.jta>
         <version.org.datanucleus.gae>2.1.1</version.org.datanucleus.gae>
         <version.org.datanucleus.jdo>3.0.1</version.org.datanucleus.jdo>
+        <!-- AS7 + ARQ -->
+        <version.jboss.as7>7.2.0.Alpha1-redhat-4</version.jboss.as7>
+        <version.jboss.arq>1.0.4.Final-redhat-1</version.jboss.arq>
         <!-- Testing -->
         <version.junit>4.10</version.junit>
         <version.arquillian>1.0.3.Final</version.arquillian>
         <version.shrinkwrap>1.1.0</version.shrinkwrap>
         <version.shrinkwrap.maven-resolver>2.0.0-alpha-4</version.shrinkwrap.maven-resolver>
-        <version.jboss.as7>7.2.0.Final</version.jboss.as7>
         <version.org.jboss.xnio>3.0.7.GA</version.org.jboss.xnio>
         <version.arquillian.gae>1.0.0.Alpha6</version.arquillian.gae>
         <version.jboss.maven.transformer>1.0.0.Beta4</version.jboss.maven.transformer>
@@ -215,6 +217,20 @@
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
             <url>https://repository.jboss.org/nexus/content/groups/public</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jboss-eap-repository</id>
+            <name>JBoss EAP Maven Repository</name>
+            <url>http://maven.repository.redhat.com/techpreview/eap6/6.1.0.Alpha1/maven-repository</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -715,6 +731,14 @@
                 <groupId>org.jboss.shrinkwrap.resolver</groupId>
                 <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
                 <version>${version.shrinkwrap.maven-resolver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.bom</groupId>
+                <artifactId>jboss-javaee-6.0-with-tools</artifactId>
+                <version>${version.jboss.arq}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Testing -->
