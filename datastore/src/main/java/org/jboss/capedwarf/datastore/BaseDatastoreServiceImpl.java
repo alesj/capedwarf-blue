@@ -65,6 +65,7 @@ public class BaseDatastoreServiceImpl implements BaseDatastoreService, CurrentTr
     protected final Logger log = Logger.getLogger(getClass().getName());
     protected final String appId;
     protected final AdvancedCache<Key, Entity> store;
+    protected final AdvancedCache<Key, Entity> ignoreReturnStore;
     protected final SearchManager searchManager;
     private final QueryConverter queryConverter;
     private DatastoreServiceConfig config;
@@ -103,6 +104,9 @@ public class BaseDatastoreServiceImpl implements BaseDatastoreService, CurrentTr
             store = ac;
         }
 
+        // we don't expect "put", "remove" to return anything
+        ignoreReturnStore = store.withFlags(Flag.IGNORE_RETURN_VALUES);
+
         this.searchManager = Search.getSearchManager(store);
         this.searchManager.setTimeoutExceptionFactory(new TimeoutExceptionFactory() {
             public RuntimeException createTimeoutException(String message, org.apache.lucene.search.Query query) {
@@ -114,6 +118,8 @@ public class BaseDatastoreServiceImpl implements BaseDatastoreService, CurrentTr
         this.factories = new QueryTypeFactories(this);
         // register namespaces listener
         CacheListenerRegistry.registerListener(store, CacheListenerRegistry.NAMESPACES);
+        // fix key range
+        CacheListenerRegistry.registerListener(store, CacheListenerRegistry.KEY_RANGE);
     }
 
     protected Cache<Key, Entity> createStore() {

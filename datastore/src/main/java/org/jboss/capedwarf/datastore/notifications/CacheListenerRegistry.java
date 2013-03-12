@@ -29,6 +29,7 @@ import org.infinispan.notifications.Listenable;
 import org.jboss.capedwarf.common.app.Application;
 import org.jboss.capedwarf.common.shared.EnvAppIdFactory;
 import org.jboss.capedwarf.datastore.ns.NamespaceListener;
+import org.jboss.capedwarf.datastore.KeyRangeListener;
 import org.jboss.capedwarf.shared.components.ComponentRegistry;
 import org.jboss.capedwarf.shared.components.Key;
 import org.jboss.capedwarf.shared.components.SetKey;
@@ -44,6 +45,7 @@ public class CacheListenerRegistry {
      * Cache listener handles
      */
     public static final CacheListenerHandle NAMESPACES = new NamespaceListener();
+    public static final CacheListenerHandle KEY_RANGE = new KeyRangeListener();
 
     /**
      * Register listener at runtime.

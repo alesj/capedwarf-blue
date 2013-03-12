@@ -88,6 +88,10 @@ public final class EnvironmentFactory {
             return start < next ? DatastoreService.KeyRangeState.COLLISION : DatastoreService.KeyRangeState.CONTENTION;
         }
 
+        public void updateRange(String appId, Key key, long allocationSize) {
+            nextId.set(key.getId() + allocationSize);
+        }
+
         public String getTransactionId() {
             return String.valueOf(txId.getAndIncrement());
         }

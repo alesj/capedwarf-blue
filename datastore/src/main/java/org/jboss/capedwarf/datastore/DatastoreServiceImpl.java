@@ -58,11 +58,10 @@ import org.jboss.capedwarf.shared.components.Slot;
  */
 class DatastoreServiceImpl extends BaseDatastoreServiceImpl implements DatastoreServiceInternal {
     private static final MethodInvocation<Void> setId = ReflectionUtils.cacheMethod(Key.class, "setId", Long.TYPE);
+    private static final MethodInvocation<Void> setChecked = ReflectionUtils.cacheMethod(Key.class, "setChecked", Boolean.TYPE);
 
     private DatastoreAttributes datastoreAttributes;
     private volatile Map<String, Integer> allocationsMap;
-
-    private static final String SEQUENCE_POSTFIX = "_SEQUENCE__"; // GAE's SequenceGenerator impl detail
 
     private final boolean async; // do we use async frontend
     private final EntityModifier entityModifier;
@@ -99,34 +98,8 @@ class DatastoreServiceImpl extends BaseDatastoreServiceImpl implements Datastore
         return allocationsMap;
     }
 
-    protected SequenceTuple getSequenceTuple(String kind) {
-        final String key;
-        final int p = kind.lastIndexOf(SEQUENCE_POSTFIX);
-        if (p > 0) {
-            key = kind.substring(0 , p);
-        } else {
-            key = kind;
-        }
-        // search w/o _SEQUENCE__, to find explicit ones
-        Integer allocationSize = getAllocationsMap().get(key);
-        final String sequenceName;
-        if (allocationSize != null) {
-            // impl detail, on how to diff default vs. explicit seq names
-            if (allocationSize > 0) {
-                sequenceName = key + SEQUENCE_POSTFIX; // by default add _SEQUENCE__
-            } else {
-                allocationSize = (-1) * allocationSize;
-                sequenceName = key; // use explicit sequence name
-            }
-        } else {
-            allocationSize = 1;
-            sequenceName = key + SEQUENCE_POSTFIX; // by default add _SEQUENCE__
-        }
-        return new SequenceTuple(sequenceName, allocationSize);
-    }
-
     protected AllocationTuple getRangeStart(Key parent, String kind, long num) {
-        final SequenceTuple st = getSequenceTuple(kind);
+        final SequenceTuple st = SequenceTuple.getSequenceTuple(getAllocationsMap(), kind);
         long asNum = st.getAllocationSize() * num;
         long start = KeyGenerator.generateRange(appId, parent, st.getSequenceName(), asNum);
         return new AllocationTuple(start, asNum);
@@ -183,6 +156,7 @@ class DatastoreServiceImpl extends BaseDatastoreServiceImpl implements Datastore
         if (key.isComplete() == false) {
             Long id = getRangeStart(key.getParent(), key.getKind(), 1).getStart();
             setId.invoke(key, new Object[]{id});
+            setChecked.invoke(key, new Object[]{true});
         }
     }
 
@@ -226,7 +200,7 @@ class DatastoreServiceImpl extends BaseDatastoreServiceImpl implements Datastore
 
     public DatastoreService.KeyRangeState allocateIdRange(KeyRange keyRange) {
         final String kind = keyRange.getStart().getKind();
-        final SequenceTuple st = getSequenceTuple(kind);
+        final SequenceTuple st = SequenceTuple.getSequenceTuple(getAllocationsMap(), kind);
         return KeyGenerator.checkRange(appId, keyRange, st.getSequenceName());
     }
 
@@ -295,7 +269,7 @@ class DatastoreServiceImpl extends BaseDatastoreServiceImpl implements Datastore
 
     private void doPut(List<Tuple> keyToEntityMap, Runnable post) {
         for (Tuple tuple : keyToEntityMap) {
-            store.put(tuple.key, tuple.entity);
+            ignoreReturnStore.put(tuple.key, tuple.entity);
         }
         if (post != null) {
             post.run();
@@ -304,7 +278,7 @@ class DatastoreServiceImpl extends BaseDatastoreServiceImpl implements Datastore
 
     private void doRemove(Iterable<Key> keys, Runnable post) {
         for (Key key : keys) {
-            store.remove(key);
+            ignoreReturnStore.remove(key);
         }
         if (post != null) {
             post.run();

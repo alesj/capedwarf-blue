@@ -88,6 +88,15 @@ public interface Environment {
     DatastoreService.KeyRangeState checkRange(String appId, KeyRange keyRange, String sequenceName);
 
     /**
+     * Update key range.
+     *
+     * @param appId the app id
+     * @param key the key
+     * @param allocationSize the allocationSize
+     */
+    void updateRange(String appId, Key key, long allocationSize);
+
+    /**
      * Get transaction id.
      *
      * @return the tx id

@@ -22,42 +22,37 @@
 
 package org.jboss.capedwarf.cluster;
 
+import com.google.appengine.api.datastore.Key;
 import org.infinispan.AdvancedCache;
 import org.jboss.capedwarf.common.infinispan.BaseTxTask;
 
 /**
- * Entity key id generator taks.
+ * Key range update task.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class KeyGeneratorTask extends BaseTxTask<String, Long, Long> {
-    private final String kind;
+public class KeyRangeUpdateTask extends BaseTxTask<String, Long, Void> {
+    private final Key key;
     private final long allocationSize;
-    private final long initialValue;
 
-    public KeyGeneratorTask(String kind, long allocationSize) {
-        this(kind, allocationSize, 1L);
-    }
-
-    public KeyGeneratorTask(String kind, long allocationSize, long initialValue) {
-        this.kind = kind;
+    public KeyRangeUpdateTask(Key key, long allocationSize) {
+        this.key = key;
         this.allocationSize = allocationSize;
-        this.initialValue = initialValue;
     }
 
-    protected Long callInTx() throws Exception {
+    protected Void callInTx() throws Exception {
         final AdvancedCache<String, Long> ac = getCache().getAdvancedCache();
-        final String cacheKey = kind;
+        final String cacheKey = key.getKind();
         
         if (ac.lock(cacheKey) == false)
             throw new IllegalArgumentException("Cannot get a lock on id generator for " + cacheKey);
 
-        Long nextId = ac.get(cacheKey);
-        if (nextId == null)
-            nextId = initialValue;
+        Long currentId = ac.get(cacheKey);
+        if (currentId == null)
+            currentId = key.getId();
 
-        ac.put(cacheKey, nextId + allocationSize);
+        ac.put(cacheKey, currentId + allocationSize);
 
-        return nextId;
+        return null;
     }
 }

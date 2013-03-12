@@ -56,6 +56,10 @@ public class ClusterEnvironment extends AbstractEnvironment {
         return InfinispanUtils.submit(appId, CacheName.DIST, new KeyRangeCheckTask(keyRange, sequenceName), sequenceName);
     }
 
+    public void updateRange(String appId, Key key, long allocationSize) {
+        InfinispanUtils.submit(appId, CacheName.DIST, new KeyRangeUpdateTask(key, allocationSize), key.getKind());
+    }
+
     public String getTransactionId() {
         return UUID.randomUUID().toString();
     }
