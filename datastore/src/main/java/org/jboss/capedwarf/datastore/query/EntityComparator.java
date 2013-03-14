@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2013, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,16 +22,20 @@
 
 package org.jboss.capedwarf.datastore.query;
 
-import com.google.appengine.api.datastore.Query;
-import org.infinispan.query.CacheQuery;
+import java.util.Comparator;
+import java.util.Map;
+
+import com.google.appengine.api.datastore.Entity;
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public abstract class QueryHolder {
-    abstract Query getQuery();
-    abstract CacheQuery getCacheQuery();
-    abstract boolean isInTx();
-    abstract boolean isDistinct();
-    abstract void executePostLoad(Object result);
+class EntityComparator implements Comparator<Entity> {
+    static final Comparator<Entity> INSTANCE = new EntityComparator();
+
+    public int compare(Entity e1, Entity e2) {
+        Map<String, Object> p1 = e1.getProperties();
+        Map<String, Object> p2 = e2.getProperties();
+        return p1.equals(p2) ? 0 : -1;
+    }
 }

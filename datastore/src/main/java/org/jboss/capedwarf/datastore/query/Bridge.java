@@ -44,6 +44,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.BooleanBridge;
 import org.hibernate.search.bridge.builtin.FloatBridge;
 import org.hibernate.search.bridge.builtin.StringBridge;
+import org.jboss.capedwarf.common.io.MarshallingUtils;
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
@@ -167,11 +168,12 @@ public enum Bridge implements TwoWayStringBridge {
 
     private static class CollectionBridge implements TwoWayStringBridge {
         public Object stringToObject(String stringValue) {
-            return null;  // TODO
+            return MarshallingUtils.APP.readObject(Object.class, stringToBytes(stringValue));
         }
 
         public String objectToString(Object object) {
-            return object.toString();
+            byte[] bytes = MarshallingUtils.APP.writeObject(object);
+            return bytesToString(bytes);
         }
     }
 
