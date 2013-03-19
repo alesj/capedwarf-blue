@@ -55,6 +55,7 @@ public class TasksMessageCreator implements MessageCreator {
     static final String CURRENT_NAMESPACE = "X-AppEngine-Current-Namespace";
 
     public static final String HDR_SCHEDULED_DELIVERY_TIME = "_HQ_SCHED_DELIVERY";
+    public static final String TASK_NAME_KEY = "__CD__TaskName__";
 
     private final String queueName;
     private final TaskOptionsHelper taskOptions;
@@ -84,6 +85,7 @@ public class TasksMessageCreator implements MessageCreator {
     }
 
     public void enhanceMessage(Message message) throws Exception {
+        message.setStringProperty(TASK_NAME_KEY, taskOptions.getTaskName());
         addMethod(message);
         addHeaders(message);
         addParameters(message);
