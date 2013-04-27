@@ -47,6 +47,8 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.jboss.capedwarf.common.reflection.ReflectionUtils;
@@ -59,7 +61,10 @@ import org.jboss.capedwarf.shared.components.Keys;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public class CapedwarfURLFetchService implements URLFetchService {
+    // private static TargetInvocation<Boolean> getAllowTruncate = ReflectionUtils.cacheInvocation(FetchOptions.class, "getAllowTruncate");
     private static TargetInvocation<Boolean> getFollowRedirects = ReflectionUtils.cacheInvocation(FetchOptions.class, "getFollowRedirects");
+    private static TargetInvocation<Double> getDeadline = ReflectionUtils.cacheInvocation(FetchOptions.class, "getDeadline");
+    private static TargetInvocation<Enum> getCertificateValidationBehavior = ReflectionUtils.cacheInvocation(FetchOptions.class, "getCertificateValidationBehavior");
 
     public HTTPResponse fetch(URL url) throws IOException {
         return fetch(new HTTPRequest(url));
@@ -119,8 +124,26 @@ public class CapedwarfURLFetchService implements URLFetchService {
 
         FetchOptions options = request.getFetchOptions();
         if (options != null) {
+            HttpParams params = base.getParams();
+
             boolean followRedirects = getFollowRedirects.invokeUnchecked(options);
-            base.getParams().setParameter(ClientPNames.HANDLE_REDIRECTS, followRedirects);
+            params.setParameter(ClientPNames.HANDLE_REDIRECTS, followRedirects);
+
+            Double deadline = getDeadline.invokeUnchecked(options);
+            if (deadline != null) {
+                // TODO -- right timeout?
+                params.setParameter(CoreConnectionPNames.SO_TIMEOUT, deadline);
+            }
+
+            Enum cvb = getCertificateValidationBehavior.invokeUnchecked(options);
+            if (cvb != null) {
+                String name = cvb.name();
+                if ("DO_NOT_VALIDATE".equals(name) || "DEFAULT".equals(name)) {
+                    // TODO
+                } else if ("VALIDATE".equals(name)) {
+                    // TODO
+                }
+            }
 
             // TODO -- other options
         }
