@@ -42,8 +42,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.NamespaceManager;
 import org.jboss.capedwarf.common.config.CapedwarfEnvironment;
+import org.jboss.capedwarf.common.jms.ServletExecutorProducer;
 import org.jboss.capedwarf.common.servlet.AbstractHttpServletRequest;
 import org.jboss.capedwarf.shared.jms.AbstractServletRequestCreator;
+import org.jboss.capedwarf.shared.jms.MessageConstants;
 
 /**
  * Tasks servlet request creator.
@@ -70,6 +72,8 @@ public class TasksServletRequestCreator extends AbstractServletRequestCreator {
         } else {
             request = new TasksServletRequest(context);
         }
+        String path = ServletExecutorProducer.getString(message, MessageConstants.PATH);
+        request.setServletPath(path);
         request.setMethod(message.getStringProperty(METHOD));
         request.addHeaders(get(message, HEADERS, false));
         request.addParameters(get(message, PARAMS, true));

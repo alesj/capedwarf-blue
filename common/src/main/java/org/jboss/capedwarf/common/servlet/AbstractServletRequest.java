@@ -120,7 +120,7 @@ public abstract class AbstractServletRequest implements ServletRequest {
     }
 
     public String getScheme() {
-        return null;  // TODO
+        return "http";  // TODO
     }
 
     public String getServerName() {

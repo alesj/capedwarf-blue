@@ -51,6 +51,7 @@ import javax.servlet.http.Part;
  */
 public abstract class AbstractHttpServletRequest extends AbstractServletRequest implements HttpServletRequest {
 
+    private String path;
     private String method;
     private List<Cookie> cookies = new ArrayList<Cookie>();
     private Map<String, Set<String>> headers = new HashMap<String, Set<String>>();
@@ -140,7 +141,7 @@ public abstract class AbstractHttpServletRequest extends AbstractServletRequest 
     }
 
     public String getContextPath() {
-        return null;  // TODO
+        return getServletContext().getContextPath();
     }
 
     public String getQueryString() {
@@ -172,7 +173,11 @@ public abstract class AbstractHttpServletRequest extends AbstractServletRequest 
     }
 
     public String getServletPath() {
-        return null;  // TODO
+        return path;
+    }
+
+    public void setServletPath(String path) {
+        this.path = path;
     }
 
     public HttpSession getSession(boolean create) {
