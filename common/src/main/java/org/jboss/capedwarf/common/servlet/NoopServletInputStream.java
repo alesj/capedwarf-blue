@@ -22,8 +22,10 @@
 
 package org.jboss.capedwarf.common.servlet;
 
-import javax.servlet.ServletInputStream;
 import java.io.IOException;
+
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
 
 /**
  * Noop ServletInputStream
@@ -36,6 +38,17 @@ class NoopServletInputStream extends ServletInputStream {
 
     public int read() throws IOException {
         return -1;
+    }
+
+    public boolean isFinished() {
+        return true;
+    }
+
+    public boolean isReady() {
+        return true;
+    }
+
+    public void setReadListener(ReadListener readListener) {
     }
 }
 
