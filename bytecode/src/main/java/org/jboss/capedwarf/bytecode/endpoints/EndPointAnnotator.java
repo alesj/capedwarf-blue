@@ -84,9 +84,14 @@ public class EndPointAnnotator extends Annotator {
         for (CtMethod method : getClazz().getDeclaredMethods()) {
             ApiMethod apiMethod = (ApiMethod) method.getAnnotation(ApiMethod.class);
             if (apiMethod != null) {
+                registerConverters(api, method);
                 convertApiMethodAnnotation(method, apiMethod);
             }
         }
+    }
+
+    private void registerConverters(Api api, CtMethod method) {
+        // TODO
     }
 
     private Annotation createPathAnnotation(String urlPath) {
