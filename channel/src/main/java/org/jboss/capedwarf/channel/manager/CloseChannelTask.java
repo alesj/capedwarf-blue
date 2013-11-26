@@ -22,27 +22,18 @@
 
 package org.jboss.capedwarf.channel.manager;
 
-import java.io.Serializable;
-import java.util.concurrent.Callable;
-import java.util.logging.Logger;
-
 /**
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  */
-public class CloseChannelTask implements Callable<Void>, Serializable {
-
-    private final Logger log = Logger.getLogger(getClass().getName());
-
-    private String channelToken;
-
+public class CloseChannelTask extends AbstractNotificationTask<Void> {
     public CloseChannelTask(String channelToken) {
-        this.channelToken = channelToken;
+        super(channelToken);
     }
 
     public Void call() throws Exception {
-        if (ChannelQueueManager.getInstance().channelQueueExists(channelToken)) {
-            log.info("Obtaining channel connection for token " + channelToken);
-            ChannelQueue channelQueue = ChannelQueueManager.getInstance().getChannelQueue(channelToken);
+        final ChannelQueue channelQueue = ChannelQueueManager.getInstance().getChannelQueue(token);
+        if (channelQueue != null) {
+            log.info("Obtaining channel connection for token " + token);
             channelQueue.close();
         }
         return null;

@@ -22,37 +22,37 @@
 
 package org.jboss.capedwarf.channel.manager;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  */
-public class ChannelQueueManager {
-    private Map<String, ChannelQueue> queues = new HashMap<>();
+public abstract class AbstractChannel implements Channel {
+    private String clientId;
+    private long expirationTime;
+    private String token;
 
-    private static final ChannelQueueManager instance = new ChannelQueueManager(); // TODO: make this as it should be
-
-    public static ChannelQueueManager getInstance() {
-        return instance;
+    public AbstractChannel(String clientId, long expirationTime, String token) {
+        this.clientId = clientId;
+        this.expirationTime = expirationTime;
+        this.token = token;
     }
 
-    public synchronized ChannelQueue getOrCreateChannelQueue(String channelToken) {
-        SimpleChannel channel = SimpleChannelManager.getInstance().getChannelByToken(channelToken);
-        ChannelQueue queue = queues.get(channelToken);
-        if (queue == null) {
-            queue = new ChannelQueue(channel);
-            queues.put(channelToken, queue);
-            channel.open();
-        }
-        return queue;
+    public String getClientId() {
+        return clientId;
     }
 
-    public synchronized void removeChannelQueue(String channelToken) {
-        queues.remove(channelToken);
+    public String getToken() {
+        return token;
     }
 
-    public synchronized ChannelQueue getChannelQueue(String channelToken) {
-        return queues.get(channelToken);
+    public long getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void open() {
+        ChannelNotifications.connect(this);
+    }
+
+    public void close() {
+        ChannelNotifications.disconnect(this);
     }
 }

@@ -22,37 +22,33 @@
 
 package org.jboss.capedwarf.channel.manager;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+
+import javax.websocket.Session;
 
 /**
- * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
+ * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class ChannelQueueManager {
-    private Map<String, ChannelQueue> queues = new HashMap<>();
+public class WebSocketsChannel extends AbstractChannel {
+    private volatile Session session;
 
-    private static final ChannelQueueManager instance = new ChannelQueueManager(); // TODO: make this as it should be
-
-    public static ChannelQueueManager getInstance() {
-        return instance;
+    public WebSocketsChannel(String clientId, long expirationTime, String token) {
+        super(clientId, expirationTime, token);
     }
 
-    public synchronized ChannelQueue getOrCreateChannelQueue(String channelToken) {
-        SimpleChannel channel = SimpleChannelManager.getInstance().getChannelByToken(channelToken);
-        ChannelQueue queue = queues.get(channelToken);
-        if (queue == null) {
-            queue = new ChannelQueue(channel);
-            queues.put(channelToken, queue);
-            channel.open();
+    void setSession(Session session) {
+        session.setMaxIdleTimeout(getExpirationTime());
+        this.session = session;
+    }
+
+    public void sendMessage(String message) {
+        if (session == null) {
+            throw new IllegalStateException(String.format("No %s set for this channel!", Session.class.getName()));
         }
-        return queue;
-    }
-
-    public synchronized void removeChannelQueue(String channelToken) {
-        queues.remove(channelToken);
-    }
-
-    public synchronized ChannelQueue getChannelQueue(String channelToken) {
-        return queues.get(channelToken);
+        try {
+            session.getBasicRemote().sendText(message);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

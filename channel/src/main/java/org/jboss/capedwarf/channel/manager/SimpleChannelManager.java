@@ -23,15 +23,40 @@
 package org.jboss.capedwarf.channel.manager;
 
 import com.google.appengine.api.channel.ChannelMessage;
+import org.jboss.capedwarf.common.app.Application;
+import org.jboss.capedwarf.common.infinispan.InfinispanUtils;
 
 /**
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public interface ChannelManager {
-    Channel createChannel(String clientId, int durationMinutes);
+public class SimpleChannelManager extends AbstractChannelManager {
+    private static final SimpleChannelManager INSTANCE = new SimpleChannelManager();
 
-    void sendMessage(ChannelMessage message);
+    private SimpleChannelManager() {
+    }
 
-    void removeChannel(String token);
+    public static SimpleChannelManager getInstance() {
+        return INSTANCE;
+    }
+
+    public Channel createChannel(String clientId, int durationMinutes) {
+        SimpleChannel channel = DatastoreAdapter.create(clientId, toExpirationTime(durationMinutes), generateToken());
+        channel.setConnectedNode(InfinispanUtils.getLocalNode(Application.getAppId()));
+        return channel;
+    }
+
+    public void sendMessage(ChannelMessage message) {
+        for (Channel channel : DatastoreAdapter.getChannels(message.getClientId())) {
+            channel.sendMessage(message.getMessage());
+        }
+    }
+
+    public void removeChannel(String token) {
+        getChannelByToken(token).close(); // TODO -- delete?
+    }
+
+    SimpleChannel getChannelByToken(String token) {
+        return DatastoreAdapter.getChannelByToken(token);
+    }
 }

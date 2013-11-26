@@ -28,12 +28,11 @@ import java.util.List;
  * @author <a href="mailto:marko.luksa@gmail.com">Marko Luksa</a>
  */
 public class ChannelQueue {
-
-    private final Channel channel;
+    private final SimpleChannel channel;
 
     private boolean closed;
 
-    public ChannelQueue(Channel channel) {
+    public ChannelQueue(SimpleChannel channel) {
         this.channel = channel;
     }
 

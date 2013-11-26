@@ -26,14 +26,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.capedwarf.channel.manager.Channel;
 import org.jboss.capedwarf.channel.manager.ChannelManager;
+import org.jboss.capedwarf.channel.manager.ChannelManagerFactory;
 import org.jboss.capedwarf.channel.manager.ChannelQueue;
 import org.jboss.capedwarf.channel.manager.ChannelQueueManager;
 import org.jboss.capedwarf.channel.manager.NoSuchChannelException;
@@ -50,6 +51,14 @@ public class ChannelServlet extends HttpServlet {
     private final Logger log = Logger.getLogger(getClass().getName());
 
     public static final String SERVLET_URI = "/_ah/channel";
+
+    private ChannelManager channelManager;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        channelManager = ChannelManagerFactory.getChannelManager();
+    }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -75,8 +84,11 @@ public class ChannelServlet extends HttpServlet {
     @SuppressWarnings("UnusedParameters")
     private void closeChannel(HttpServletRequest req, HttpServletResponse resp, String channelToken) {
         try {
-            Channel channel = ChannelManager.getInstance().getChannelByToken(channelToken);
-            channel.close();
+            try {
+                channelManager.removeChannel(channelToken);
+            } finally {
+                ChannelQueueManager.getInstance().removeChannelQueue(channelToken);
+            }
         } catch (NoSuchChannelException ex) {
             log.warning("No channel for token " + channelToken);
         }
@@ -87,7 +99,7 @@ public class ChannelServlet extends HttpServlet {
 
         ChannelQueue queue;
         try {
-            queue = ChannelQueueManager.getInstance().getChannelQueue(channelToken);
+            queue = ChannelQueueManager.getInstance().getOrCreateChannelQueue(channelToken);
         } catch (NoSuchChannelException e) {
             log.severe("No channel for token " + channelToken);
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
