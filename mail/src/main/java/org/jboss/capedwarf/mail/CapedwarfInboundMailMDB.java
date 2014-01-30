@@ -34,8 +34,8 @@ import javax.mail.MessagingException;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import org.jboss.capedwarf.common.config.CapedwarfEnvironment;
-import org.jboss.capedwarf.common.shared.SimpleAppIdFactory;
 import org.jboss.capedwarf.shared.components.AppIdFactory;
+import org.jboss.capedwarf.shared.components.SimpleAppIdFactory;
 import org.jboss.capedwarf.shared.config.QueueXml;
 import org.wildfly.mail.ra.MailListener;
 
