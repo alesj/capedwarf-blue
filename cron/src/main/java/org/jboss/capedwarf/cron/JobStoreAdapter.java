@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2014, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -20,34 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.capedwarf.common.infinispan;
+package org.jboss.capedwarf.cron;
+
+import org.quartz.spi.JobStore;
 
 /**
- * Available caches in CapeDwarf.
- *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public enum CacheName {
-    DEFAULT("default"),
-    DATA("data"),
-    LOGS("logs"),
-    METADATA("metadata"),
-    MEMCACHE("memcache"),
-    DIST("dist"),
-    TASKS("tasks"),
-    SEARCH("search"),
-    PROSPECTIVE_SEARCH("prospective_search"),
-    DATASTORE_VERSIONS("datastore_versions"),
-    CHANNEL("channel"),
-    SCHEDULER("scheduler");
-
-    private String name;
-
-    private CacheName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+interface JobStoreAdapter extends JobStore {
+    boolean lock();
+    boolean unlock();
 }

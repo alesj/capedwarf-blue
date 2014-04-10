@@ -40,7 +40,7 @@ import org.quartz.spi.ThreadPool;
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CronThreadPool implements ThreadPool {
+public class CapedwarfThreadPool implements ThreadPool {
     private ModuleLoader loader;
     private ModuleIdentifier moduleIdentifier;
 
