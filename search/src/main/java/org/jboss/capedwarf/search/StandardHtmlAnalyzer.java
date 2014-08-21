@@ -22,28 +22,30 @@
 
 package org.jboss.capedwarf.search;
 
-import java.io.Reader;
-import java.util.Collections;
-
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharReader;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
+import org.apache.lucene.analysis.AnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 
 /**
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
-public final class StandardHtmlAnalyzer extends Analyzer {
+public final class StandardHtmlAnalyzer extends AnalyzerWrapper {
 
     private StandardAnalyzer standardAnalyzer;
 
-    public StandardHtmlAnalyzer(Version luceneVersion) {
-        this.standardAnalyzer = new StandardAnalyzer(luceneVersion, Collections.emptySet());
+    private StandardHtmlAnalyzer(StandardAnalyzer standardAnalyzer) {
+        super(standardAnalyzer.getReuseStrategy());
+        this.standardAnalyzer = standardAnalyzer;
     }
 
-    public final TokenStream tokenStream(String fieldName, Reader reader) {
-        return standardAnalyzer.tokenStream(fieldName, new HTMLStripCharFilter(CharReader.get(reader)));
+    public static Analyzer createAnalyzer() {
+        StandardAnalyzer standardAnalyzer = new StandardAnalyzer(Version.LUCENE_48);
+        return new StandardHtmlAnalyzer(standardAnalyzer);
+    }
+
+    @Override
+    protected Analyzer getWrappedAnalyzer(String fieldName) {
+        return standardAnalyzer;
     }
 }

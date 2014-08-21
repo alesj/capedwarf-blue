@@ -24,12 +24,12 @@
 
 package org.jboss.capedwarf.datastore.query;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.appengine.api.datastore.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Converts GAE's Query.SortPredicates to Lucene's Sort.
@@ -47,7 +47,7 @@ public class SortPredicateConverter {
     }
 
     private List<SortField> convertToSortFields(List<Query.SortPredicate> sortPredicates) {
-        List<SortField> sortFields = new ArrayList<SortField>();
+        List<SortField> sortFields = new ArrayList<>();
         for (Query.SortPredicate sortPredicate : sortPredicates) {
             sortFields.add(convertToSortField(sortPredicate));
         }
@@ -56,6 +56,6 @@ public class SortPredicateConverter {
 
     private SortField convertToSortField(Query.SortPredicate sortPredicate) {
         boolean reverse = sortPredicate.getDirection() == Query.SortDirection.DESCENDING;
-        return new SortField(sortPredicate.getPropertyName(), SortField.STRING, reverse);   // TODO: find appropriate SortField type
+        return new SortField(sortPredicate.getPropertyName(), SortField.Type.STRING, reverse);   // TODO: find appropriate SortField type
     }
 }

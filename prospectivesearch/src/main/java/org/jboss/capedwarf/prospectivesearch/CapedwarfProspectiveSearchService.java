@@ -41,7 +41,7 @@ import com.google.appengine.api.prospectivesearch.Subscription;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
-import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.infinispan.Cache;
@@ -83,7 +83,7 @@ public class CapedwarfProspectiveSearchService implements ProspectiveSearchServi
         try {
             Query luceneQuery = parseQuery(query);
             TopicAndSubId key = new TopicAndSubId(topic, subId);
-            long expirationTimeSec = System.currentTimeMillis()/1000 + (leaseDurationSeconds == 0 ? 0xffffffffL : leaseDurationSeconds);
+            long expirationTimeSec = System.currentTimeMillis() / 1000 + (leaseDurationSeconds == 0 ? 0xffffffffL : leaseDurationSeconds);
             SubscriptionHolder value = new SubscriptionHolder(topic, subId, query, luceneQuery, expirationTimeSec);
 
             if (leaseDurationSeconds == 0) {
@@ -134,13 +134,13 @@ public class CapedwarfProspectiveSearchService implements ProspectiveSearchServi
                           String resultTaskQueueName, int resultBatchSize, boolean resultReturnDocument) {
         Queue queue = QueueFactory.getQueue(resultTaskQueueName);
 
-        for (int offset = 0; offset < subscriptions.size(); offset+=resultBatchSize) {
+        for (int offset = 0; offset < subscriptions.size(); offset += resultBatchSize) {
             List<Subscription> batch = subscriptions.subList(offset, Math.min(offset + resultBatchSize, subscriptions.size()));
             TaskOptions taskOptions = TaskOptions.Builder.withUrl(resultRelativeUrl)
-                .param("results_offset", String.valueOf(offset))
-                .param("results_count", String.valueOf(batch.size()))
-                .param("topic", topic)
-                .param("key", resultKey);
+                    .param("results_offset", String.valueOf(offset))
+                    .param("results_count", String.valueOf(batch.size()))
+                    .param("topic", topic)
+                    .param("key", resultKey);
 
             for (Subscription subscription : batch) {
                 taskOptions.param("id", subscription.getId());

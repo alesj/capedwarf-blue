@@ -29,7 +29,8 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 import com.google.appengine.api.search.GeoPoint;
-import org.infinispan.marshall.Externalizer;
+import org.infinispan.commons.marshall.Externalizer;
+
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>

@@ -80,8 +80,8 @@ public class CapedwarfLogService implements ExposedLogService {
     public CapedwarfLogService() {
         String appId = Application.getAppId();
         store = InfinispanUtils.<String, CapedwarfLogElement>getCache(appId, CacheName.LOGS)
-            .getAdvancedCache()
-            .withFlags(Flag.IGNORE_RETURN_VALUES);
+                .getAdvancedCache()
+                .withFlags(Flag.IGNORE_RETURN_VALUES);
         this.searchManager = Search.getSearchManager(store);
 
         final Compatibility instance = Compatibility.getRawInstance();
@@ -168,7 +168,7 @@ public class CapedwarfLogService implements ExposedLogService {
 
         Query luceneQuery = getQuery(queryBuilder, queries);
         CacheQuery cacheQuery = searchManager.getQuery(luceneQuery, CapedwarfRequestLogs.class);
-        cacheQuery.sort(new Sort(new SortField(CapedwarfRequestLogs.END_TIME_USEC, SortField.LONG, true)));
+        cacheQuery.sort(new Sort(new SortField(CapedwarfRequestLogs.END_TIME_USEC, SortField.Type.LONG, true)));
         cacheQuery.firstResult(logQuery.getOptions().getOffset());
         if (logQuery.getOptions().getLimit() != null) {
             cacheQuery.maxResults(logQuery.getOptions().getLimit());
@@ -203,7 +203,7 @@ public class CapedwarfLogService implements ExposedLogService {
         QueryBuilder queryBuilder = searchManager.buildQueryBuilderForClass(CapedwarfAppLogLine.class).get();
         Query query = queryBuilder.keyword().onField(CapedwarfAppLogLine.REQUEST_ID).matching(requestLogs.getRequestId()).createQuery();
         CacheQuery cacheQuery = searchManager.getQuery(query, CapedwarfAppLogLine.class);
-        cacheQuery.sort(new Sort(new SortField(CapedwarfAppLogLine.SEQUENCE_NUMBER, SortField.LONG)));
+        cacheQuery.sort(new Sort(new SortField(CapedwarfAppLogLine.SEQUENCE_NUMBER, SortField.Type.LONG)));
         return cacheQuery;
     }
 
@@ -353,10 +353,10 @@ public class CapedwarfLogService implements ExposedLogService {
 
         // combined='93.103.26.101 - - [17/Jan/2013:08:07:11 -0800] "GET /favicon.ico HTTP/1.1" 404 0 - "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17"',
         requestLogs.setCombined(
-            requestLogs.getIp() + " - " + requestLogs.getNickname() + (requestLogs.getNickname().isEmpty() ? "" : " ")
-                + "- [" + DATE_FORMAT.format(requestLogs.getStartTimeUsec() / 1000L) + "] \""
-                + requestLogs.getMethod() + " " + requestLogs.getResource() + " " + requestLogs.getHttpVersion() + "\" "
-                + requestLogs.getStatus() + " " + requestLogs.getResponseSize() + " - \"" + requestLogs.getUserAgent() + "\""
+                requestLogs.getIp() + " - " + requestLogs.getNickname() + (requestLogs.getNickname().isEmpty() ? "" : " ")
+                        + "- [" + DATE_FORMAT.format(requestLogs.getStartTimeUsec() / 1000L) + "] \""
+                        + requestLogs.getMethod() + " " + requestLogs.getResource() + " " + requestLogs.getHttpVersion() + "\" "
+                        + requestLogs.getStatus() + " " + requestLogs.getResponseSize() + " - \"" + requestLogs.getUserAgent() + "\""
         );
 
 //        requestLogs.setOffset();  TODO

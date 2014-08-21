@@ -55,7 +55,7 @@ public class QueryConverter {
 
         GAEQueryTreeVisitor visitor = createTreeVisitor(allFieldName);
 
-        QueryTreeWalker<Context> walker = new QueryTreeWalker<Context>(visitor);
+        QueryTreeWalker<Context> walker = new QueryTreeWalker<>(visitor);
         walker.walk(tree, context);
 
         return context.getQuery();
