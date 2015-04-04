@@ -33,6 +33,8 @@ import java.util.Set;
 import com.google.appengine.api.datastore.Entity;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.infinispan.query.backend.ExtendedSearchWorkCreator;
+import org.infinispan.query.backend.SearchWorkCreatorContext;
 import org.infinispan.query.impl.DefaultSearchWorkCreator;
 import org.jboss.capedwarf.shared.config.ApplicationConfiguration;
 import org.jboss.capedwarf.shared.config.IndexesXml;
@@ -41,7 +43,7 @@ import org.jboss.capedwarf.shared.datastore.DatastoreConstants;
 /**
  * @author <a href="mailto:mluksa@redhat.com">Marko Luksa</a>
  */
-public class CapedwarfSearchWorkCreator extends DefaultSearchWorkCreator<Object> {
+public class CapedwarfSearchWorkCreator extends DefaultSearchWorkCreator<Object> implements ExtendedSearchWorkCreator<Object> {
 
     @Override
     public Collection<Work> createPerEntityWorks(Object value, Serializable id, WorkType workType) {
@@ -90,5 +92,9 @@ public class CapedwarfSearchWorkCreator extends DefaultSearchWorkCreator<Object>
             }
         }
         return entities;
+    }
+
+    public boolean shouldRemove(SearchWorkCreatorContext context) {
+        return (context.getPreviousValue() != null);
     }
 }
