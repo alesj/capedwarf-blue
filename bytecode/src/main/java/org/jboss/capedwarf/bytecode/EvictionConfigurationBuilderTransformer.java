@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2015, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,15 +22,31 @@
 
 package org.jboss.capedwarf.bytecode;
 
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.NotFoundException;
+
 /**
- * Group all CapeDwarf transformers.
- *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class CapedwarfTransformer extends ListTransformer {
-    public CapedwarfTransformer() {
-        addTransformer(new FactoriesTransformer());
-        addTransformer(new MiscTransformer());
-        addTransformer(new LibsTransformer());
+public class EvictionConfigurationBuilderTransformer extends RewriteTransformer {
+    protected void transformInternal(CtClass clazz) throws Exception {
+        final ClassPool pool = clazz.getClassPool();
+        CtClass intClass = pool.get(int.class.getName());
+
+        CtMethod method = new CtMethod(clazz, "maxEntries", new CtClass[]{intClass}, clazz);
+        method.setBody("return maxEntries((new Integer($1).longValue()));");
+        clazz.addMethod(method);
+    }
+
+    protected boolean doCheck(CtClass clazz) throws NotFoundException {
+        int count = 0;
+        for (CtMethod m : clazz.getDeclaredMethods()) {
+            if ("maxEntries".equals(m.getName())) {
+                count++;
+            }
+        }
+        return (count == 2);
     }
 }
