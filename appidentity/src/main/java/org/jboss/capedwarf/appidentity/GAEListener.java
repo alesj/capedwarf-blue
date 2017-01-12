@@ -22,6 +22,8 @@
 
 package org.jboss.capedwarf.appidentity;
 
+import java.util.logging.Logger;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -171,6 +173,7 @@ public class GAEListener extends ConfigurationAware implements ServletContextLis
         if (session != null) {
             PrincipalInfo principal = (PrincipalInfo) session.getAttribute(CapedwarfHttpServletRequestWrapper.USER_PRINCIPAL_SESSION_ATTRIBUTE_KEY);
             if (principal != null) {
+                Logger.getLogger("LOGIN").warning(principal.toString());
                 environment.setUserId(principal.getUserId());
                 environment.setEmail(principal.getName());
                 environment.setAuthDomain(principal.getAuthDomain());

@@ -2,6 +2,7 @@ package org.jboss.capedwarf.users;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +21,9 @@ public class DevelopmentAuthHandler extends AuthHandler {
         ServletUtils.handleResponse(response);
 
         String email = request.getParameter("email");
+
+        Logger.getLogger("LOGIN").warning("Dev handler: " + email);
+
         if (email == null) {
             showLoginForm(request, response);
         } else {

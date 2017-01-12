@@ -63,4 +63,9 @@ class CapedwarfUserPrincipal implements PrincipalInfo, Principal, Serializable {
     public boolean isAdmin() {
         return isAdmin;
     }
+
+    @Override
+    public String toString() {
+        return "Principal: " + email;
+    }
 }

@@ -1,6 +1,7 @@
 package org.jboss.capedwarf.users;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +32,7 @@ public abstract class AuthHandler {
     }
 
     protected void setupUserPrincipal(HttpServletRequest request, String email, String userId, String authDomain, boolean isAdmin) {
+        Logger.getLogger("LOGIN").warning("Setting principal: " + email);
         request.getSession().setAttribute(
             CapedwarfHttpServletRequestWrapper.USER_PRINCIPAL_SESSION_ATTRIBUTE_KEY,
             new CapedwarfUserPrincipal(userId, email, authDomain, isAdmin)
