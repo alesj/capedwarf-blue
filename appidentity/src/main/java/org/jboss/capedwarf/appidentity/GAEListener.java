@@ -170,8 +170,10 @@ public class GAEListener extends ConfigurationAware implements ServletContextLis
     private void initUserData(CapedwarfEnvironment environment, HttpServletRequest request) {
         HttpSession session = request.getSession();
         // our fake request doesn't create session
+        Logger.getLogger("LOGIN : session - ").warning("" + session);
         if (session != null) {
             PrincipalInfo principal = (PrincipalInfo) session.getAttribute(CapedwarfHttpServletRequestWrapper.USER_PRINCIPAL_SESSION_ATTRIBUTE_KEY);
+            Logger.getLogger("LOGIN : principal - ").warning("" + principal);
             if (principal != null) {
                 Logger.getLogger("LOGIN").warning(principal.toString());
                 environment.setUserId(principal.getUserId());
